@@ -1,0 +1,43 @@
+services:
+  streamlit:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: streamlit_app
+    ports:
+      - "8501:8501"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/
+      - MONGO_DB=app_database
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    volumes:
+      - ./:/app
+    depends_on:
+      - mongo
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  mongo:
+    image: mongo:7.0
+    container_name: mongodb
+    ports:
+      - "27020:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=app_database
+    volumes:
+      - mongo_data:/data/db
+      - mongo_config:/data/configdb
+    restart: unless-stopped
+    networks:
+      - app-network
+
+volumes:
+  mongo_data:
+    driver: local
+  mongo_config:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge

@@ -1,0 +1,72 @@
+openapi: 3.0.3
+info:
+  title: Bills API
+  description: API for submitting and managing bills
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000
+    description: Production server
+paths:
+  /bills:
+    post:
+      summary: Submit a bill file
+      description: Upload a bill document for processing
+      operationId: submitBill
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: The bill file to upload
+              required:
+                - file
+      responses:
+        "201":
+          description: Bill submitted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                    description: Unique identifier for the submitted bill
+                    example: "123e4567-e89b-12d3-a456-426614174000"
+                  status:
+                    type: string
+                    description: Current status of the bill
+                    example: "pending"
+                    enum:
+                      - pending
+                      - processing
+                      - completed
+                      - failed
+                required:
+                  - id
+                  - status
+        "400":
+          description: Bad request - invalid file or missing parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Invalid file format"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Failed to process bill"

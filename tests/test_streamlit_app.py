@@ -6,6 +6,9 @@ import uuid
 import sys
 from unittest.mock import Mock, patch, MagicMock
 
+# Mock streamlit and its dependencies before importing streamlit_app
+sys.modules['streamlit'] = MagicMock()
+
 # Add the api directory to the Python path so we can import streamlit_app
 sys.path.insert(0, str(Path(__file__).parent.parent / "api"))
 

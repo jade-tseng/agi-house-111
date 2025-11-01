@@ -5,7 +5,8 @@ from pymongo import MongoClient
 import PyPDF2
 from typing import Optional, Dict, Any
 
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+OPENAI_API_KEY="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"
+
 MONGO_URI = os.environ.get("MONGO_URI", "mongodb://localhost:27017/")
 MONGO_DB = os.environ.get("MONGO_DB", "app_database")
 

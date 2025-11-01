@@ -1,0 +1,17 @@
+{
+  "os": "macOS-15.5-arm64-arm-64bit",
+  "python": "CPython 3.12.11",
+  "startedAt": "2025-11-01T23:09:38.462430Z",
+  "program": "/Users/jade/agi-house-111/rl/medical_rl.py",
+  "codePath": "rl/medical_rl.py",
+  "codePathLocal": "rl/medical_rl.py",
+  "git": {
+    "remote": "https://github.com/jade-tseng/agi-house-111.git",
+    "commit": "6b652e53120c761b7d885448634d70b1e1a4dd88"
+  },
+  "email": "jadeyutseng@gmail.com",
+  "root": "/Users/jade/agi-house-111",
+  "host": "Mac.localdomain",
+  "executable": "/opt/homebrew/Caskroom/miniforge/base/bin/python",
+  "writerId": "m4d32ii78sb8yn5plur3dr9baun7jhoq"
+}

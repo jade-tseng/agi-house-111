@@ -1,0 +1,37 @@
+{
+  "os": "macOS-15.5-arm64-arm-64bit",
+  "python": "CPython 3.12.11",
+  "startedAt": "2025-11-01T23:13:21.165826Z",
+  "program": "/Users/jade/agi-house-111/rl/medical_rl.py",
+  "codePath": "rl/medical_rl.py",
+  "codePathLocal": "rl/medical_rl.py",
+  "git": {
+    "remote": "https://github.com/jade-tseng/agi-house-111.git",
+    "commit": "0707634557d50c3feda97d6ad2501229c06faf0a"
+  },
+  "email": "jadeyutseng@gmail.com",
+  "root": "/Users/jade/agi-house-111",
+  "host": "Mac.localdomain",
+  "executable": "/opt/homebrew/Caskroom/miniforge/base/bin/python",
+  "cpu_count": 14,
+  "cpu_count_logical": 14,
+  "disk": {
+    "/": {
+      "total": "994662584320",
+      "used": "325007450112"
+    }
+  },
+  "memory": {
+    "total": "25769803776"
+  },
+  "apple": {
+    "name": "Apple M4 Pro",
+    "ecpuCores": 4,
+    "pcpuCores": 10,
+    "gpuCores": 20,
+    "memoryGb": 24,
+    "swapTotalBytes": "23622320128",
+    "ramTotalBytes": "25769803776"
+  },
+  "writerId": "7h9lsmxi3as76plcinzgg12vgx983nji"
+}

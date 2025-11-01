@@ -1,0 +1,41 @@
+_wandb:
+    value:
+        cli_version: 0.22.3
+        e:
+            m4d32ii78sb8yn5plur3dr9baun7jhoq:
+                codePath: rl/medical_rl.py
+                codePathLocal: rl/medical_rl.py
+                email: jadeyutseng@gmail.com
+                executable: /opt/homebrew/Caskroom/miniforge/base/bin/python
+                git:
+                    commit: 6b652e53120c761b7d885448634d70b1e1a4dd88
+                    remote: https://github.com/jade-tseng/agi-house-111.git
+                host: Mac.localdomain
+                os: macOS-15.5-arm64-arm-64bit
+                program: /Users/jade/agi-house-111/rl/medical_rl.py
+                python: CPython 3.12.11
+                root: /Users/jade/agi-house-111
+                startedAt: "2025-11-01T23:09:38.462430Z"
+                writerId: m4d32ii78sb8yn5plur3dr9baun7jhoq
+        m: []
+        python_version: 3.12.11
+        t:
+            "1":
+                - 95
+            "2":
+                - 95
+            "3":
+                - 13
+                - 16
+            "4": 3.12.11
+            "5": 0.22.3
+            "12": 0.22.3
+            "13": darwin-arm64
+episodes:
+    value: 100
+learning_rate:
+    value: 0.001
+model:
+    value: gpt-4
+reward_threshold:
+    value: 0.8

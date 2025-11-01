@@ -13,19 +13,19 @@ composio = Composio(provider=OpenAIProvider(), api_key="your_composio_api_key")
 # Create openai client
 openai = OpenAI()
 
-# Get calendar tools for this user
+# Get Gmail tools for this user
 tools = composio.tools.get(
   user_id=user_id,
-  tools=["GOOGLECALENDAR_EVENTS_LIST"]
+  tools=["GMAIL_SEND_EMAIL"]
 )
 
-# Ask the LLM to check calendar
+# Ask the LLM to send an email
 result = openai.chat.completions.create(
   model="gpt-4o-mini",
   tools=tools,
   messages=[
-      {"role": "system", "content": "You are a helpful assistant."},
-      {"role": "user", "content": f"What's on my calendar for the next 7 days. Its {datetime.now().strftime("%Y-%m-%d")} today.",}
+      {"role": "system", "content": "You are a helpful email assistant. Send professional emails as requested."},
+      {"role": "user", "content": "Send an email to recipient@example.com with subject 'Test Email from Composio' and body 'Hello, this is a test email sent using Composio and OpenAI integration. Best regards!'"}
   ]
 )
 

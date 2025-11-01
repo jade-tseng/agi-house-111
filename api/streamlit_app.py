@@ -2,6 +2,63 @@ import streamlit as st
 import uuid
 from pathlib import Path
 import os
+from pymongo import MongoClient
+from typing import Dict, BinaryIO, Union
+
+# MongoDB connection setup
+MONGO_URI = os.environ.get("MONGO_URI", "mongodb://localhost:27017/")
+MONGO_DB = os.environ.get("MONGO_DB", "app_database")
+
+# Initialize MongoDB client and get bills collection
+mongo_client = MongoClient(MONGO_URI)
+db = mongo_client[MONGO_DB]
+bills_collection = db["bills"]
+
+def save_uploaded_bill(file_content: bytes, bills_dir: Path) -> Dict[str, str]:
+    """
+    Save an uploaded bill file to the bills directory with a UUID filename.
+    Also creates a MongoDB document with the file metadata.
+    
+    Args:
+        file_content: The binary content of the file to save
+        bills_dir: Path to the directory where bills should be saved
+        
+    Returns:
+        Dictionary containing the UUID and status
+        
+    Raises:
+        Exception: If file save or MongoDB insertion fails
+    """
+    # Generate UUID
+    bill_uuid = uuid.uuid4()
+    
+    # Save file with UUID as filename
+    file_path = bills_dir / f"{bill_uuid}.pdf"
+    
+    try:
+        # Write the file to disk
+        with open(file_path, "wb") as f:
+            f.write(file_content)
+        
+        # Create MongoDB document
+        document = {
+            "id": str(bill_uuid),
+            "path": f"./bills/{bill_uuid}.pdf",
+            "status": "pending"
+        }
+        
+        # Insert document into MongoDB
+        bills_collection.insert_one(document)
+        
+        return {
+            "id": str(bill_uuid),
+            "status": "pending"
+        }
+    except Exception as e:
+        # If MongoDB insertion fails, clean up the saved file
+        if file_path.exists():
+            file_path.unlink()
+        raise Exception(f"Failed to save bill: {str(e)}")
 
 # Page configuration
 st.set_page_config(
@@ -29,30 +86,19 @@ if uploaded_file is not None:
     if not uploaded_file.name.lower().endswith('.pdf'):
         st.error("❌ File not supported - Only PDF files are accepted")
     else:
-        # Generate UUID
-        bill_uuid = uuid.uuid4()
-        
-        # Save file with UUID as filename
-        file_path = bills_dir / f"{bill_uuid}.pdf"
-        
         try:
-            # Write the uploaded file to disk
-            with open(file_path, "wb") as f:
-                f.write(uploaded_file.getbuffer())
+            # Save the uploaded file using the extracted function
+            response_data = save_uploaded_bill(uploaded_file.getbuffer(), bills_dir)
             
             # Display success message with response data
             st.success("✅ Bill submitted successfully!")
             
             # Display response in JSON format matching the API spec
             st.subheader("Response")
-            response_data = {
-                "id": str(bill_uuid),
-                "status": "pending"
-            }
-            
             st.json(response_data)
             
             # Additional info
+            file_path = bills_dir / f"{response_data['id']}.pdf"
             st.info(f"📁 File saved to: `{file_path}`")
             
         except Exception as e:

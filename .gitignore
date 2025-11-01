@@ -2,3 +2,6 @@
 
 # Ignore large dataset files
 data/BeechstreetAP_*.csv
+tests/__pycache__/*
+api/__pycache__/*
+api/__pycache__/*

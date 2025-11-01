@@ -1,8 +1,20 @@
 from openai import OpenAI
 import os
+from pathlib import Path
+from pymongo import MongoClient
+import PyPDF2
+from typing import Optional, Dict, Any
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+MONGO_URI = os.environ.get("MONGO_URI", "mongodb://localhost:27017/")
+MONGO_DB = os.environ.get("MONGO_DB", "app_database")
+
 client = OpenAI(api_key=OPENAI_API_KEY)
+
+# Initialize MongoDB client
+mongo_client = MongoClient(MONGO_URI)
+db = mongo_client[MONGO_DB]
+bills_collection = db["bills"]
 
 ## this is basic chat completion, change once org gets access to reasoning capability
 system_message = """
@@ -28,21 +40,95 @@ When reviewing medical bills or insurance issues, look for:
 Always provide actionable advice and explain the legal basis for any disputes you recommend.
 """
 
-user_query = "Research the economic impact of semaglutide on global healthcare systems."
+def extract_text_from_pdf(file_path: Path) -> str:
+    """Extract text content from a PDF file."""
+    try:
+        with open(file_path, 'rb') as file:
+            pdf_reader = PyPDF2.PdfReader(file)
+            text = ""
+            for page in pdf_reader.pages:
+                text += page.extract_text() + "\n"
+        return text.strip()
+    except Exception as e:
+        raise Exception(f"Failed to extract text from PDF: {str(e)}")
 
-response = client.chat.completions.create(
-  model="gpt-4.1",
-  messages=[
-    {
-      "role": "system",
-      "content": system_message
-    },
-    {
-      "role": "user",
-      "content": user_query
+def get_bill_by_id(bill_id: str) -> Optional[Dict[str, Any]]:
+    """Retrieve bill document from MongoDB by ID."""
+    return bills_collection.find_one({"id": bill_id})
+
+def analyze_medical_bill(bill_id: str) -> Dict[str, Any]:
+    """
+    Analyze a medical bill for issues and provide legal advice.
+    
+    Args:
+        bill_id: UUID of the bill to analyze
+        
+    Returns:
+        Dictionary containing analysis results and recommendations
+    """
+    # Get bill from database
+    bill_doc = get_bill_by_id(bill_id)
+    if not bill_doc:
+        raise Exception(f"Bill with ID {bill_id} not found")
+    
+    # Extract text from PDF
+    file_path = Path(bill_doc["path"])
+    if not file_path.exists():
+        raise Exception(f"Bill file not found at {file_path}")
+    
+    bill_text = extract_text_from_pdf(file_path)
+    
+    # Create user query with bill content
+    user_query = f"""
+    Please analyze this medical bill for potential issues, errors, and billing irregularities:
+
+    MEDICAL BILL CONTENT:
+    {bill_text}
+
+    Please provide:
+    1. A summary of the bill
+    2. Any potential issues or red flags you identify
+    3. Specific recommendations for disputing incorrect charges
+    4. Legal basis for any disputes you recommend
+    5. Next steps the patient should take
+    """
+    
+    # Get AI analysis
+    response = client.chat.completions.create(
+        model="gpt-4",
+        messages=[
+            {
+                "role": "system",
+                "content": system_message
+            },
+            {
+                "role": "user",
+                "content": user_query
+            }
+        ]
+    )
+    
+    analysis_result = response.choices[0].message.content
+    
+    # Update bill status in database
+    bills_collection.update_one(
+        {"id": bill_id},
+        {"$set": {"status": "analyzed", "analysis": analysis_result}}
+    )
+    
+    return {
+        "bill_id": bill_id,
+        "status": "analyzed",
+        "analysis": analysis_result,
+        "bill_text": bill_text[:500] + "..." if len(bill_text) > 500 else bill_text  # Truncated for response
     }
-  ]
-)
 
-# Access the response content
-print(response.choices[0].message.content)
+# Example usage - uncomment to test with a specific bill ID
+# if __name__ == "__main__":
+#     bill_id = "your-bill-uuid-here"
+#     try:
+#         result = analyze_medical_bill(bill_id)
+#         print("Analysis Result:")
+#         print(result["analysis"])
+#     except Exception as e:
+#         print(f"Error: {e}")

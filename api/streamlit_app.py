@@ -66,7 +66,7 @@ def summarize_bill_with_vision(file_path: Path) -> str:
                     "content": [
                         {
                             "type": "text",
-                            "text": "Please analyze this bill and provide a summary with the following details: vendor name, total amount, date, and main items/services.",
+                            "text": "Please analyze this bill and provide a summary with the following details: vendor name, total amount, date, contact information, and main items/services.",
                         },
                         {
                             "type": "image_url",
@@ -80,10 +80,13 @@ def summarize_bill_with_vision(file_path: Path) -> str:
             max_tokens=500,
         )
 
-        return response.choices[0].message.content
-
+        res = response.choices[0].message.content
+        if res is None or res == "":
+            return "No summary available"
+        return res
     except Exception as e:
-        raise Exception(f"Failed to summarize bill: {str(e)}")
+        print(f"Failed to summarize bill: {str(e)}")
+        return f"Failed to summarize bill: {str(e)}"
 
 
 def save_uploaded_bill(

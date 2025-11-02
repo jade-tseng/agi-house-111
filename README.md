@@ -19,7 +19,7 @@ A Streamlit application with MongoDB backend for health economics research and b
 
 1. Clone the repository and navigate to the project directory:
 ```bash
-cd /Users/ignacio/agi-house-111
+cd /Users/ignacio/agi-house-111 
 ```
 
 2. Create a `.env` file from the example:
